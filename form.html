@@ -1,0 +1,30 @@
+<div id="qr-reader" class="mt-4" style="position: relative; padding: 0px; border: none;"></div>
+<div id="qr-reader-results"></div>
+<br>
+<form id="InventoryForm" onsubmit="handleFormSubmit(this)">
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-qr-code-scan"></i></span>
+    <input type="text" class="form-control" id="employeeCode" name="employeeCode" placeholder="Scan QR/Bar Code" readonly>
+  </div>
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-box-fill"></i></span>
+    <input type="text" class="form-control" id="Name" name="Name" placeholder="Enter your Name">
+  </div>
+    <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-box-fill"></i></span>
+    <input type="text" class="form-control" id="Email" name="Email" placeholder="Enter your Email">
+  </div>
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-tags-fill"></i></span>
+    <input type="text" class="form-control" id="Group" name="Group" placeholder="Enter your group">
+  </div>
+  <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-123"></i></span>
+    <input type="text" class="form-control" id="ManagementLevel" name="ManagementLevel" placeholder="Enter your management Level">
+  </div>
+  <!-- <div class="mb-3 input-group">
+    <span class="input-group-text bg-primary text-white"><i class="bi bi-currency-dollar"></i></span>
+    <input type="text" class="form-control" id="status" name="status" placeholder="Enter status">
+  </div> -->
+  <button type="submit" class="btn btn-primary mb-3 w-100">Submit</button>
+</form>
