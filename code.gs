@@ -1,3 +1,6 @@
+// This function is used to query data from the spreadsheet
+
+
 function practice(id){
   try {
     const sheet = SpreadsheetApp.openByUrl("");
@@ -30,3 +33,44 @@ function onQRCodeScan(){
     console.log("No Data found for the scanned ID");
   }
 }
+
+
+// This is the entry point for rendering the HTML template when accessed via GET request
+function doGet() {
+  let template = HtmlService.createTemplateFromFile('index');
+  let html = template.evaluate().setTitle('Christmas Party Attendance Scanner');
+
+  // Allow the page to be embedded
+  html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  html.addMetaTag('viewport', 'width=device-width, initial-scale=1');
+
+  return html;
+}
+
+// Define the name of the sheet to store the form data
+const sheetName = "AttendanceSheet";
+
+// Function to handle form submission and send data to Google Sheets
+function processForm(formObject) {
+  const ss = SpreadsheetApp.getActive();
+  const dataSheet = ss.getSheetByName(sheetName);
+
+  // Append form data to the sheet
+  dataSheet.appendRow([
+    new Date().toLocaleString(),  // Timestamp
+    formObject.employeeCode,       // QR scanned product code (identifier)
+    formObject.Name,              // Name
+    formObject.Email,             // Email
+    formObject.Group,             // Group
+    formObject.ManagementLevel   // Management Level
+  ]);
+}
+
+// Utility function to include HTML files (e.g., for CSS/JS imports)
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+
+
+
