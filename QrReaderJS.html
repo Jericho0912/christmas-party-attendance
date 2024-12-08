@@ -1,0 +1,57 @@
+<!--
+  This code uses the html5-qrcode library from GitHub: https://github.com/mebjas/html5-qrcode
+  Example Link: https://gist.github.com/mebjas/729c5397506a879ec704075c8a5284e8
+ -->
+
+ <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js" type="text/javascript"></script>
+
+ <script>
+   function docReady(fn) {
+     // see if DOM is already available
+     if (document.readyState === "complete" || document.readyState === "interactive") {
+         // call on next available tick
+         setTimeout(fn, 1);
+     } else {
+         document.addEventListener("DOMContentLoaded", fn);
+     }
+   } 
+ 
+   docReady(function() {
+       var resultContainer = document.getElementById('qr-reader-results');
+       var lastResult, countResults = 0;
+       
+       var html5QrcodeScanner = new Html5QrcodeScanner(
+           "qr-reader", { fps: 10, qrbox: 250 });
+       
+ function onScanSuccess(decodedText, decodedResult) {
+                 if (decodedText !== lastResult) {
+                     ++countResults;
+                     lastResult = decodedText;
+                     console.log(`Scan result = ${decodedText}`, decodedResult);
+ 
+                     resultContainer.innerHTML += `<div class="p-3 mb-2 bg-success text-white">[${countResults}] - ${decodedText}</div>`;
+ 
+                     // Send the scanned employee code to Google Apps Script to get employee data
+                     google.script.run.withSuccessHandler(function(response) {
+                         // Fill in the form with the returned data
+                         if (response) {
+                             document.getElementById("employeeCode").value = decodedText;
+                             document.getElementById("employeeName").value = response.name;
+                             document.getElementById("employeeDepartment").value = response.department;
+                             document.getElementById("employeePosition").value = response.position;
+                         } else {
+                             alert("No matching employee found.");
+                         }
+                     }).getEmployeeData(decodedText);  // Pass the scanned code to the Apps Script function
+                 }
+             }
+       
+       // Optional callback for error, can be ignored.
+       function onScanError(qrCodeError) {
+           // This callback would be called in case of qr code scan error or setup error.
+           // You can avoid this callback completely, as it can be very verbose in nature.
+       }
+       
+       html5QrcodeScanner.render(onScanSuccess, onScanError);
+   });
+ </script>
