@@ -1,40 +1,3 @@
-// This function is used to query data from the spreadsheet
-
-
-function practice(id){
-  try {
-    const sheet = SpreadsheetApp.openByUrl("");
-    const name = sheet.getSheetByName("Sheet1");
-
-    const columnID = 1;
-    const range = name.getRange(1, columnID, name.getLastRow(), 1);
-    const ids = range.getValues().flat();
-    const rowIndex = ids.indexOf(id);
-
-    if(rowIndex === -1){
-      console.log("ID not found");
-      return null;
-    }
-    
-    const rowData = name.getRange(rowIndex + 1, 1, 1, name.getLastColumn()).getValues()[0];
-    return rowData;
-  } catch (error) {
-    console.error("Error accessing the sheet or retrieving data:", error);
-    return null;
-  }
-}
-
-function onQRCodeScan(){
-  const scannedID = 1001; // Replace with actual scanned ID from QR code
-  const data = practice(scannedID);
-  if(data){
-    console.log("Scanned Data:", data);
-  } else {
-    console.log("No Data found for the scanned ID");
-  }
-}
-
-
 // This is the entry point for rendering the HTML template when accessed via GET request
 function doGet() {
   let template = HtmlService.createTemplateFromFile('index');
@@ -72,5 +35,60 @@ function include(filename) {
 }
 
 
+// Function to get the employee data based on ID
+function getSheetData(id) {
+  try {
+    Logger.log("Searching for employee ID: '" + id + "'"); // Log the ID being searched
+    
+    // Replace with the actual sheet URL
+    const sheet = SpreadsheetApp.openByUrl("https://docs.google.com/spreadsheets/d/1Mrf6F9Ta2bCG8y63APaT64EP0uIRysTJHoShqUjI0TM/");
+    const name = sheet.getSheetByName("Sheet1");
+    const columnID = 1;  // Column 1 contains the employee codes
+    const range = name.getRange(1, columnID, name.getLastRow(), 1);  // Get all employee codes in the column
+    const ids = range.getValues().flat();  // Flatten the 2D array into a 1D array
 
+    // Sanitize input ID by trimming spaces
+    const sanitizedID = String(id).trim();  // Convert to string and trim spaces from the scanned ID
+    Logger.log("Sanitized Employee ID: '" + sanitizedID + "'"); // Log sanitized ID
+    
+    // Find the index of the sanitized ID in the sheet
+    const rowIndex = ids.findIndex(function(code) {
+      return String(code).trim() === sanitizedID;  // Trim spaces from each code in the sheet for comparison
+    });
+
+    Logger.log("Row index found: " + rowIndex); // Log the row index (remember, this is zero-based)
+
+    if (rowIndex === -1) {
+      Logger.log("ID not found");  // Log if ID is not found
+      return null;
+    }
+
+    // Adjust rowIndex to be 1-based for Google Sheets
+    const rowData = name.getRange(rowIndex + 1, 1, 1, name.getLastColumn()).getValues()[0];
+    Logger.log("Row data: " + rowData);  // Log the row data
+    
+    // Return the user data in the expected format
+    return {
+      name: rowData[1],         // Assuming name is in column 2 (adjust if necessary)
+      email: rowData[2],        // Assuming email is in column 3 (adjust if necessary)
+      group: rowData[3],        // Assuming group is in column 4 (adjust if necessary)
+      managementLevel: rowData[4] // Assuming management level is in column 5 (adjust if necessary)
+    };
+  } catch (error) {
+    Logger.log("Error accessing the sheet or retrieving data: " + error);
+    return null;
+  }
+}
+
+// Function to be called from frontend (HTML/JS)
+function getEmployeeData(employeeCode) {
+  Logger.log("Received employee code from frontend: '" + employeeCode + "'"); // Log received code
+  
+  if (employeeCode) {
+    return getSheetData(employeeCode);  // Pass the employee code correctly to getSheetData
+  } else {
+    Logger.log("Error: employee code is undefined or invalid");
+    return null;
+  }
+}
 
